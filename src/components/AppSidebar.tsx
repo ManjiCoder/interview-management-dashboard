@@ -51,6 +51,16 @@ export default function AppSidebar() {
   const pathname = usePathname();
   const { user, logout } = useUser();
 
+  // 👇 Close sidebar only if mobile (screen < 1024px)
+  const closeSidebarOnMobile = () => {
+    if (window.innerWidth < 1024) {
+      const trigger = document.querySelector(
+        '[data-sidebar="trigger"]'
+      ) as HTMLElement;
+      if (trigger) trigger.click();
+    }
+  };
+
   const renderMenuItems = (items: typeof menuItems.admin) =>
     items.map((item) => (
       <SidebarMenuItem key={item.name}>
@@ -60,6 +70,7 @@ export default function AppSidebar() {
               <SidebarMenuButton asChild isActive={pathname === item.href}>
                 <Link
                   href={item.href}
+                  onClick={closeSidebarOnMobile} // 👈 close only on mobile
                   className={cn(
                     'flex items-center gap-2',
                     pathname === item.href && 'font-semibold text-primary'
@@ -82,15 +93,19 @@ export default function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild>
-              <Link href='/' className='text-lg font-bold'>
+              <Link
+                href='/'
+                className='text-lg font-bold'
+                onClick={closeSidebarOnMobile}
+              >
                 IMD
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        {/* ADMIN MENU */}
         {user?.role === 'admin' && (
           <SidebarGroup>
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
@@ -100,7 +115,6 @@ export default function AppSidebar() {
           </SidebarGroup>
         )}
 
-        {/* TA MEMBER MENU */}
         {['ta_member', 'admin'].includes(user ? user.role : 'guest') && (
           <SidebarGroup>
             <SidebarGroupLabel>TA Member</SidebarGroupLabel>
@@ -110,7 +124,6 @@ export default function AppSidebar() {
           </SidebarGroup>
         )}
 
-        {/* PANELIST MENU */}
         {['panelist', 'admin'].includes(user ? user.role : 'guest') && (
           <SidebarGroup>
             <SidebarGroupLabel>Panelist</SidebarGroupLabel>
@@ -120,13 +133,14 @@ export default function AppSidebar() {
           </SidebarGroup>
         )}
 
-        {/* LOGOUT BUTTON */}
-
         <div className='p-4 mt-auto'>
           <Button
             variant='destructive'
             className='w-full flex items-center justify-center gap-2'
-            onClick={() => logout()}
+            onClick={() => {
+              closeSidebarOnMobile();
+              logout();
+            }}
           >
             <LogOut className='w-4 h-4' />
             Logout

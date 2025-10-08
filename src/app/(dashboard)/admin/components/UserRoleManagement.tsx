@@ -122,7 +122,9 @@ export default function UserRoleManagementTable({
           ID <ArrowUpDown className='ml-2 h-4 w-4' />
         </Button>
       ),
-      cell: ({ row }) => row.original.id,
+      cell: ({ row }) => {
+        return <div className='text-left pl-3'>{row.original.id}</div>;
+      },
     },
     {
       accessorKey: 'name',
@@ -317,7 +319,7 @@ export function ChangeRoleModal({
       <DialogContent>
         <DialogHeader>
           <DialogTitle className='text-center'>Change Role</DialogTitle>
-          <DialogDescription className='flex flex-col items-center gap-4 mt-4 text-slate-200'>
+          <DialogDescription className='flex flex-col items-center gap-4 mt-4 text-slate-800 dark:text-slate-200'>
             <p>
               Changing role for{' '}
               <span className='font-bold'>

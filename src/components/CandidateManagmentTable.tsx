@@ -72,7 +72,9 @@ export default function CandidateManagementTable({ users }: Props) {
           ID <ArrowUpDown className='ml-2 h-4 w-4' />
         </Button>
       ),
-      cell: ({ row }) => row.original.id,
+      cell: ({ row }) => {
+        return <div className='text-left pl-3'>{row.original.id}</div>;
+      },
     },
     {
       accessorKey: 'name',
