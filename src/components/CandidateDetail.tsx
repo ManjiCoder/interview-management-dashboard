@@ -118,7 +118,7 @@ export default function CandidateDetail({ user, todos, feedback }: Props) {
               todos.map((todo) => (
                 <Card key={todo.id}>
                   <CardHeader className='flex flex-row items-center justify-between p-4 pb-2'>
-                    <div>
+                    <div className='flex flex-col gap-y-3'>
                       <CardTitle className='text-base font-semibold'>
                         {todo.todo}
                       </CardTitle>
@@ -128,7 +128,7 @@ export default function CandidateDetail({ user, todos, feedback }: Props) {
                     </div>
                     <div>
                       <span
-                        className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                        className={`w-28 h-8 flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                           todo.completed
                             ? 'bg-green-100 text-green-800'
                             : 'bg-yellow-100 text-yellow-800'
@@ -138,7 +138,7 @@ export default function CandidateDetail({ user, todos, feedback }: Props) {
                       </span>
                     </div>
                   </CardHeader>
-                  <CardContent className='pt-0 pb-4 px-4 text-sm text-muted-foreground'>
+                  <CardContent className='-mt-4 pb-4 px-4 text-sm text-muted-foreground'>
                     {todo.completed
                       ? 'This task has been completed successfully.'
                       : 'This task is still in progress or scheduled.'}

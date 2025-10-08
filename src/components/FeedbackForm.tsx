@@ -19,10 +19,13 @@ import { z } from 'zod';
 import ErrorMessage from './ErrorMessage';
 
 const feedbackSchema = z.object({
-  overallScore: z
-    .string()
-    .min(1, { message: 'Score must be between 1 and 10' })
-    .max(10, { message: 'Score must be between 1 and 10' }),
+  overallScore: z.string().refine(
+    (val) => {
+      const num = Number(val);
+      return !isNaN(num) && num >= 1 && num <= 10;
+    },
+    { message: 'Score must be a number between 1 and 10' }
+  ),
   strengths: z
     .string()
     .min(5, { message: 'Please provide at least 5 characters for strengths' }),
