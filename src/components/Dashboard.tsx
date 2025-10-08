@@ -3,16 +3,15 @@
 import { format } from 'date-fns';
 import { useMemo, useState } from 'react';
 import { DateRange } from 'react-day-picker';
+import { Area, AreaChart, CartesianGrid, XAxis } from 'recharts';
+
 import {
-  Bar,
-  BarChart,
-  CartesianGrid,
-  Legend,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from '@/components/ui/chart';
 
 import { Button } from '@/components/ui/button';
 import { Calendar } from '@/components/ui/calendar';
@@ -287,36 +286,93 @@ export default function DashboardPage() {
           <CardTitle>Weekly Performance</CardTitle>
         </CardHeader>
         <CardContent className='h-80'>
-          <ResponsiveContainer width='100%' height='100%'>
-            <BarChart
-              data={filteredData}
-              margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
-            >
-              <CartesianGrid strokeDasharray='3 3' />
-              <XAxis dataKey='day' />
-              <YAxis />
-              <Tooltip wrapperClassName='dark:text-black' />
-              <Legend />
-              <Bar
+          <ChartContainer
+            config={{
+              interviews: { label: 'Interviews', color: 'var(--chart-1)' },
+              noShows: { label: 'No Shows', color: 'var(--chart-2)' },
+              feedback: { label: 'Avg Feedback', color: 'var(--chart-3)' },
+            }}
+            className='h-full w-full'
+          >
+            <AreaChart data={filteredData} className='w-full h-full'>
+              <defs>
+                <linearGradient id='fillInterviews' x1='0' y1='0' x2='0' y2='1'>
+                  <stop
+                    offset='5%'
+                    stopColor='var(--chart-1)'
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset='95%'
+                    stopColor='var(--chart-1)'
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id='fillNoShows' x1='0' y1='0' x2='0' y2='1'>
+                  <stop
+                    offset='5%'
+                    stopColor='var(--chart-2)'
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset='95%'
+                    stopColor='var(--chart-2)'
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+                <linearGradient id='fillFeedback' x1='0' y1='0' x2='0' y2='1'>
+                  <stop
+                    offset='5%'
+                    stopColor='var(--chart-3)'
+                    stopOpacity={0.8}
+                  />
+                  <stop
+                    offset='95%'
+                    stopColor='var(--chart-3)'
+                    stopOpacity={0.1}
+                  />
+                </linearGradient>
+              </defs>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey='day'
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={
+                  <ChartTooltipContent
+                    labelFormatter={(value) => `${value}`}
+                    indicator='dot'
+                  />
+                }
+              />
+              <Area
                 dataKey='interviews'
-                name='Interviews'
-                fill='hsl(var(--blue))'
-                radius={[6, 6, 0, 0]}
+                type='natural'
+                fill='url(#fillInterviews)'
+                stroke='var(--chart-1)'
+                stackId='a'
               />
-              <Bar
+              <Area
                 dataKey='noShows'
-                name='No Shows'
-                fill='hsl(var(--red))'
-                radius={[6, 6, 0, 0]}
+                type='natural'
+                fill='url(#fillNoShows)'
+                stroke='var(--chart-2)'
+                stackId='a'
               />
-              <Bar
+              <Area
                 dataKey='feedback'
-                name='Avg Feedback'
-                fill='hsl(var(--green))'
-                radius={[6, 6, 0, 0]}
+                type='natural'
+                fill='url(#fillFeedback)'
+                stroke='var(--chart-3)'
+                stackId='a'
               />
-            </BarChart>
-          </ResponsiveContainer>
+              <ChartLegend content={<ChartLegendContent />} />
+            </AreaChart>
+          </ChartContainer>
         </CardContent>
       </Card>
     </div>
