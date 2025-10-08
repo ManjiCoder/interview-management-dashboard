@@ -36,9 +36,9 @@ const menuItems = {
     { name: 'Role Management', href: '/admin/users', icon: Users },
   ],
   ta_member: [
-    { name: 'Dashboard', href: '/ta', icon: LayoutDashboard },
-    { name: 'Candidate Management', href: '/ta/candidate', icon: Users },
-    { name: 'Reports', href: '/ta', icon: BarChart },
+    { name: 'Dashboard', href: '/ta_member', icon: LayoutDashboard },
+    { name: 'Candidate Management', href: '/ta_member/candidate', icon: Users },
+    { name: 'Reports', href: '/ta_member', icon: BarChart },
   ],
   panelist: [
     { name: 'Dashboard', href: '/panelist', icon: LayoutDashboard },

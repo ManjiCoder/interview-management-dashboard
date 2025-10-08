@@ -304,7 +304,7 @@ export default function DashboardPage() {
               <CartesianGrid strokeDasharray='3 3' />
               <XAxis dataKey='day' />
               <YAxis />
-              <Tooltip />
+              <Tooltip wrapperClassName='dark:text-black' />
               <Legend />
               <Bar
                 dataKey='interviews'

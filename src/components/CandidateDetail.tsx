@@ -8,6 +8,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useUser } from '@/contexts/user/UserContext';
 import { Post, Todo, User } from '@/services/api';
 import axios from 'axios';
 import Image from 'next/image';
@@ -22,13 +23,9 @@ type Props = {
 
 export default function CandidateDetail({ user, todos, feedback }: Props) {
   const [feedbacks, setFeedbacks] = React.useState<Post[]>(feedback);
-
-  const role = React.useMemo(() => {
-    const userData = sessionStorage.getItem('user');
-    return userData ? JSON.parse(userData).role : 'panelist';
-  }, []);
-
-  const canSubmitFeedback = role !== 'admin' || role === 'panelist';
+  const { user: loginUser } = useUser();
+  const role = loginUser?.role || 'guest';
+  const canSubmitFeedback = ['admin', 'panelist'].includes(role);
 
   const handleFeedbackSubmit = async (newFb: Post) => {
     try {

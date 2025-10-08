@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getUsers, User } from '@/services/api';
 import UserRoleManagement from '../components/UserRoleManagement';
 

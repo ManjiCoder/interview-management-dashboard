@@ -32,9 +32,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useUser } from '@/contexts/user/UserContext';
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
 
 type User = {
   id: number;
@@ -51,6 +51,7 @@ type Props = {
 
 export default function CandidateManagementTable({ users }: Props) {
   const router = useRouter();
+  const { user: loginUser } = useUser();
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -58,11 +59,6 @@ export default function CandidateManagementTable({ users }: Props) {
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
-
-  const role = React.useMemo(() => {
-    const user = sessionStorage.getItem('user');
-    return user ? JSON.parse(user).role : 'panelist';
-  }, []);
 
   const columns: ColumnDef<User>[] = [
     {
@@ -107,24 +103,15 @@ export default function CandidateManagementTable({ users }: Props) {
         const user = row.original;
         return (
           <div className='flex gap-2'>
-            {(role === 'admin' || role === 'ta_member') && (
-              <Button
-                variant='outline'
-                size='sm'
-                onClick={() => router.push(`/ta/candidate/${user.id}`)}
-              >
-                View
-              </Button>
-            )}
-            {role !== 'admin' && (
-              <Button
-                variant='secondary'
-                size='sm'
-                onClick={() => toast.success(`Feedback for ${user.firstName}`)}
-              >
-                Feedback
-              </Button>
-            )}
+            <Button
+              variant='outline'
+              size='sm'
+              onClick={() =>
+                router.push(`/${loginUser?.role}/candidate/${user.id}`)
+              }
+            >
+              View
+            </Button>
           </div>
         );
       },

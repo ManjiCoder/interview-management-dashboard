@@ -20,7 +20,7 @@ import ErrorMessage from './ErrorMessage';
 
 const feedbackSchema = z.object({
   overallScore: z
-    .number()
+    .string()
     .min(1, { message: 'Score must be between 1 and 10' })
     .max(10, { message: 'Score must be between 1 and 10' }),
   strengths: z

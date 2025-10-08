@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import CandidateManagementTable from '@/components/CandidateManagmentTable';
 import { getUsers, User } from '@/services/api';
 

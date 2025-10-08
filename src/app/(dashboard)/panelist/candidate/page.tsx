@@ -1,5 +1,6 @@
 import CandidateManagementTable from '@/components/CandidateManagmentTable';
 import { getUsers, User } from '@/services/api';
+export const dynamic = 'force-dynamic';
 
 export default async function CandidateManagementPage() {
   const data = await getUsers();
