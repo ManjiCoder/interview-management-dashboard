@@ -20,14 +20,14 @@ import {
 } from '@/components/ui/select';
 import { useUser } from '@/contexts/user/UserContext';
 import { loginUser } from '@/services/api';
-import { roles } from '@/utils/roles';
+import { UserRoles } from '@/types/constant';
 
 // Zod schema
 const loginSchema = z.object({
   username: z.string().min(1, 'Username is required'),
   password: z.string().min(1, 'Password is required'),
   role: z
-    .enum(['admin', 'ta_member', 'panelist'])
+    .enum(Object.keys(UserRoles))
     .refine((val) => !!val, { message: 'Please select a role' }),
 });
 
@@ -54,9 +54,11 @@ export default function LoginPage() {
     try {
       await loginUser(data.username, data.password);
       login(data);
-      if (data.role === 'admin') router.push('/admin');
-      else if (data.role === 'ta_member') router.push('/ta_member');
-      else router.push('/panelist');
+      if (UserRoles[data.role as keyof typeof UserRoles]) {
+        router.push(`/${data.role}`);
+      } else {
+        toast.error('Invalid role selected');
+      }
     } catch {
       toast.error('Invalid credentials');
     }
@@ -109,9 +111,9 @@ export default function LoginPage() {
                       <SelectValue placeholder='Select Role' />
                     </SelectTrigger>
                     <SelectContent>
-                      {roles.map((role) => (
-                        <SelectItem key={role} value={role}>
-                          {role.toUpperCase()}
+                      {Object.keys(UserRoles).map((key) => (
+                        <SelectItem key={key} value={key}>
+                          {UserRoles[key as keyof typeof UserRoles]}
                         </SelectItem>
                       ))}
                     </SelectContent>

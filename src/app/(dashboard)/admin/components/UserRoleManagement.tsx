@@ -1,6 +1,22 @@
 'use client';
 
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
   ColumnDef,
   ColumnFiltersState,
   flexRender,
@@ -15,14 +31,6 @@ import {
 import * as React from 'react';
 
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -41,6 +49,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 
+import { UserRoles } from '@/types/constant';
 import { ArrowUpDown, ChevronDown } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -59,9 +68,11 @@ type Props = {
 };
 
 export default function UserRoleManagementTable({
-  users,
+  users: initialUsers,
   onRoleChange,
 }: Props) {
+  const [users, setUsers] = React.useState<User[]>(initialUsers);
+
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -70,26 +81,33 @@ export default function UserRoleManagementTable({
     React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState({});
 
-  const [confirmModalOpen, setConfirmModalOpen] = React.useState(false);
   const [selectedUser, setSelectedUser] = React.useState<User | null>(null);
-  const [selectedRole, setSelectedRole] = React.useState<string | null>(null);
-
-  const currentUserRole = React.useMemo(() => {
-    const user = sessionStorage.getItem('user');
-    return user ? JSON.parse(user).role : 'panelist';
-  }, []);
 
   const handleRoleChange = (user: User, newRole: string) => {
     if (user.role === newRole) {
-      toast.info(`${user.firstName} already has role ${newRole}`);
+      toast.info(
+        `${user.firstName} already has role ${
+          UserRoles[newRole as keyof typeof UserRoles]
+        }`
+      );
       return;
     }
 
+    // Optimistic local update
+    setUsers((prev) =>
+      prev.map((u) => (u.id === user.id ? { ...u, role: newRole } : u))
+    );
+
+    toast.success(
+      `Updated ${user.firstName}'s role to ${
+        UserRoles[newRole as keyof typeof UserRoles]
+      }`
+    );
+
+    // Optional external callback
     if (onRoleChange) {
       onRoleChange(user.id, newRole);
     }
-
-    toast.success(`Role updated to ${newRole} for ${user.firstName}`);
   };
 
   const columns: ColumnDef<User>[] = [
@@ -115,40 +133,15 @@ export default function UserRoleManagementTable({
     {
       accessorKey: 'role',
       header: 'Role',
-      cell: ({ row }) => {
-        const user = row.original;
-
-        if (currentUserRole !== 'admin') {
-          return <span>{user.role}</span>;
-        }
-
-        return (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant='outline' size='sm' className='capitalize'>
-                {user.role} <ChevronDown className='ml-1 h-3 w-3' />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align='start'>
-              <DropdownMenuLabel>Change Role</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              {['admin', 'ta_member', 'panelist'].map((r) => (
-                <DropdownMenuItem
-                  key={r}
-                  onClick={() => {
-                    setSelectedUser(user);
-                    setSelectedRole(r);
-                    setConfirmModalOpen(true);
-                  }}
-                  className='capitalize'
-                >
-                  {r}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      },
+      cell: ({ row }) => (
+        <Button
+          variant='outline'
+          className='capitalize w-32 justify-start'
+          onClick={() => setSelectedUser(row.original)}
+        >
+          {UserRoles[row.original.role as keyof typeof UserRoles]}
+        </Button>
+      ),
     },
   ];
 
@@ -173,6 +166,10 @@ export default function UserRoleManagementTable({
 
   return (
     <div className='p-6 space-y-4 w-full'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-2xl font-semibold'>Role Management</h1>
+      </div>
+
       <div className='flex items-center gap-4'>
         <Input
           placeholder='Search name...'
@@ -277,43 +274,90 @@ export default function UserRoleManagementTable({
         </div>
       </div>
 
-      {/* Confirmation Modal */}
-      <Dialog open={confirmModalOpen} onOpenChange={setConfirmModalOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Confirm Role Change</DialogTitle>
-            <DialogDescription>
-              Are you sure you want to change{' '}
-              <span className='font-medium'>
+      <ChangeRoleModal
+        selectedUser={selectedUser}
+        setSelectedUser={setSelectedUser}
+        handleRoleChange={handleRoleChange}
+      />
+    </div>
+  );
+}
+
+export function ChangeRoleModal({
+  selectedUser,
+  setSelectedUser,
+  handleRoleChange,
+}: {
+  selectedUser: User | null;
+  setSelectedUser: React.Dispatch<React.SetStateAction<User | null>>;
+  handleRoleChange: (user: User, newRole: string) => void;
+}) {
+  const [role, setRole] = React.useState<string>('');
+
+  React.useEffect(() => {
+    if (selectedUser) {
+      setRole(selectedUser.role); // preselect current role
+    }
+  }, [selectedUser]);
+
+  const handleSave = () => {
+    if (!selectedUser || !role) return;
+    if (role === selectedUser.role) {
+      toast.info('No role change detected.');
+      setSelectedUser(null);
+      return;
+    }
+    handleRoleChange(selectedUser, role);
+    setSelectedUser(null);
+  };
+
+  return (
+    <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
+      <DialogTrigger hidden>Open</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className='text-center'>Change Role</DialogTitle>
+          <DialogDescription className='flex flex-col items-center gap-4 mt-4 text-slate-200'>
+            <p>
+              Changing role for{' '}
+              <span className='font-bold'>
                 {selectedUser?.firstName} {selectedUser?.lastName}
               </span>
-              &apos;s role to{' '}
-              <span className='font-bold capitalize text-primary'>
-                {selectedRole}
+            </p>
+            <p className='flex items-center gap-2'>
+              From
+              <span className='font-bold'>
+                {UserRoles[selectedUser?.role as keyof typeof UserRoles]}
               </span>
-              ?
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className='flex justify-end gap-2 mt-4'>
-            <Button
-              variant='outline'
-              onClick={() => setConfirmModalOpen(false)}
-            >
-              Cancel
-            </Button>
-            <Button
-              onClick={() => {
-                if (selectedUser && selectedRole) {
-                  handleRoleChange(selectedUser, selectedRole);
-                }
-                setConfirmModalOpen(false);
-              }}
-            >
-              Confirm
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-    </div>
+              to
+              <span className='font-bold'>
+                {UserRoles[role as keyof typeof UserRoles]}
+              </span>
+            </p>
+
+            <Select value={role} onValueChange={setRole}>
+              <SelectTrigger className='w-[180px] capitalize'>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {Object.keys(UserRoles).map((key) => (
+                  <SelectItem key={key} value={key} className='capitalize'>
+                    {UserRoles[key as keyof typeof UserRoles]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className='flex sm:justify-center mt-5 gap-5'>
+          <Button variant='outline' onClick={() => setSelectedUser(null)}>
+            Cancel
+          </Button>
+          <Button variant='destructive' onClick={handleSave}>
+            Save Changes
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

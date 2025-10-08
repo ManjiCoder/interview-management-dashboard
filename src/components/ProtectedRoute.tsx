@@ -22,7 +22,6 @@ export default function ProtectedRoute({
     // Wait until sessionStorage is available
     const timer = setTimeout(() => {
       const sessionUser = sessionStorage.getItem('user');
-      console.log({ sessionUser });
 
       if (!sessionUser) {
         toast.error('Please login first');

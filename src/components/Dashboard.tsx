@@ -24,16 +24,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 
 import { useUser } from '@/contexts/user/UserContext';
+import { UserRoles } from '@/types/constant';
 import { BarChart3, CalendarDays, UserCheck } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 
 // eslint-disable-next-line
 const dummyData: any = {
@@ -153,6 +148,8 @@ const dummyData: any = {
 export default function DashboardPage() {
   const { user } = useUser();
   const [role, setRole] = useState(user?.role || 'guest');
+  const pathname = usePathname();
+
   const [interviewer, setInterviewer] = useState('');
   const [date, setDate] = useState<DateRange | undefined>();
 
@@ -207,23 +204,17 @@ export default function DashboardPage() {
   return (
     <div className='p-6 space-y-8 w-full'>
       <div className='flex justify-between items-center'>
-        <h1 className='text-2xl font-semibold'>{role} Dashboard Overview</h1>
+        <h1 className='text-2xl font-semibold'>
+          {UserRoles[pathname.replace('/', '') as keyof typeof UserRoles]}{' '}
+          Dashboard Overview
+        </h1>
       </div>
 
       {/* Filters */}
       <div className='grid grid-cols-1 sm:grid-cols-3 gap-4'>
         <div className='space-y-1'>
           <Label>Role</Label>
-          <Select value={role} onValueChange={setRole}>
-            <SelectTrigger>
-              <SelectValue placeholder='Select Role' />
-            </SelectTrigger>
-            <SelectContent hidden>
-              <SelectItem value='admin'>Admin</SelectItem>
-              <SelectItem value='ta_member'>TA Member</SelectItem>
-              <SelectItem value='panelist'>Panelist</SelectItem>
-            </SelectContent>
-          </Select>
+          <Input value={role} readOnly />
         </div>
 
         <div className='space-y-1'>

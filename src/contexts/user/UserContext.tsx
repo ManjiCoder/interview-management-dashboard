@@ -1,5 +1,7 @@
 'use client';
 
+import { UserRoles } from '@/types/constant';
+import { User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import {
   createContext,
@@ -46,7 +48,9 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   const login = (userData: User) => {
     sessionStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
-    toast.success(`Logged in as ${userData.role.toUpperCase()}`);
+    toast.success(
+      `Logged in as ${UserRoles[userData.role as keyof typeof UserRoles]}`
+    );
   };
 
   const logout = () => {

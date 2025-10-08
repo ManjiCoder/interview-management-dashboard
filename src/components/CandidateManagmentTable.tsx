@@ -139,6 +139,9 @@ export default function CandidateManagementTable({ users }: Props) {
 
   return (
     <div className='p-6 space-y-4 w-full'>
+      <div className='flex justify-between items-center'>
+        <h1 className='text-2xl font-semibold'>Candidate Management</h1>
+      </div>
       <div className='flex items-center gap-4'>
         <Input
           placeholder='Search name...'
