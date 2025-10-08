@@ -32,6 +32,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
+import { useUser } from '@/contexts/user/UserContext';
 import { BarChart3, CalendarDays, UserCheck } from 'lucide-react';
 
 // eslint-disable-next-line
@@ -150,7 +151,8 @@ const dummyData: any = {
 };
 
 export default function DashboardPage() {
-  const [role, setRole] = useState('admin');
+  const { user } = useUser();
+  const [role, setRole] = useState(user?.role || 'guest');
   const [interviewer, setInterviewer] = useState('');
   const [date, setDate] = useState<DateRange | undefined>();
 
@@ -216,7 +218,7 @@ export default function DashboardPage() {
             <SelectTrigger>
               <SelectValue placeholder='Select Role' />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent hidden>
               <SelectItem value='admin'>Admin</SelectItem>
               <SelectItem value='ta_member'>TA Member</SelectItem>
               <SelectItem value='panelist'>Panelist</SelectItem>

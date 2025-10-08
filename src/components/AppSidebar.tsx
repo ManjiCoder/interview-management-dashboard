@@ -49,8 +49,7 @@ const menuItems = {
 
 export default function AppSidebar() {
   const pathname = usePathname();
-
-  const { logout } = useUser();
+  const { user, logout } = useUser();
 
   const renderMenuItems = (items: typeof menuItems.admin) =>
     items.map((item) => (
@@ -92,28 +91,34 @@ export default function AppSidebar() {
       </SidebarHeader>
       <SidebarContent>
         {/* ADMIN MENU */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Admin</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>{renderMenuItems(menuItems.admin)}</SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {user?.role === 'admin' && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Admin</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderMenuItems(menuItems.admin)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* TA MEMBER MENU */}
-        <SidebarGroup>
-          <SidebarGroupLabel>TA Member</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>{renderMenuItems(menuItems.ta_member)}</SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {['ta_member', 'admin'].includes(user ? user.role : 'guest') && (
+          <SidebarGroup>
+            <SidebarGroupLabel>TA Member</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderMenuItems(menuItems.ta_member)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* PANELIST MENU */}
-        <SidebarGroup>
-          <SidebarGroupLabel>Panelist</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>{renderMenuItems(menuItems.panelist)}</SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
+        {['panelist', 'admin'].includes(user ? user.role : 'guest') && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Panelist</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>{renderMenuItems(menuItems.panelist)}</SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )}
 
         {/* LOGOUT BUTTON */}
 
