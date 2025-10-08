@@ -55,7 +55,7 @@ export default function LoginPage() {
       await loginUser(data.username, data.password);
       login(data);
       if (data.role === 'admin') router.push('/admin');
-      else if (data.role === 'ta_member') router.push('/ta');
+      else if (data.role === 'ta_member') router.push('/ta_member');
       else router.push('/panelist');
     } catch {
       toast.error('Invalid credentials');
