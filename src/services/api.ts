@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Define API instance
 const api = axios.create({
-  baseURL: 'https://dummyjson.com',
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'https://dummyjson.com',
 });
 
 // ----------- Types -----------

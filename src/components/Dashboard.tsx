@@ -207,7 +207,7 @@ export default function DashboardPage() {
   return (
     <div className='p-6 space-y-8 w-full'>
       <div className='flex justify-between items-center'>
-        <h1 className='text-2xl font-semibold'>Dashboard Overview</h1>
+        <h1 className='text-2xl font-semibold'>{role} Dashboard Overview</h1>
       </div>
 
       {/* Filters */}
